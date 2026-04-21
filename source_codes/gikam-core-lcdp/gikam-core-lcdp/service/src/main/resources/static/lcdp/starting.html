@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统启动中</title>
+    <style>
+        :root {
+            --page-bg-start: #eaf1f8;
+            --page-bg-end: #f7fbfe;
+            --text-main: #17324b;
+            --text-sub: #667a90;
+            --accent: #1d6fd8;
+            --accent-soft: rgba(29, 111, 216, 0.1);
+            --line-soft: rgba(111, 133, 156, 0.1);
+            --beam-soft: rgba(59, 130, 246, 0.08);
+            --beam-strong: rgba(35, 99, 190, 0.12);
+            --ring-soft: rgba(29, 111, 216, 0.06);
+            --ring-strong: rgba(29, 111, 216, 0.13);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "HarmonyOS Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+            color: var(--text-main);
+            background:
+                radial-gradient(circle at 12% 2%, rgba(76, 122, 175, 0.18), transparent 24%),
+                radial-gradient(circle at 86% 84%, rgba(122, 152, 186, 0.18), transparent 22%),
+                linear-gradient(125deg, rgba(255, 255, 255, 0.58), transparent 34%),
+                linear-gradient(0deg, rgba(29, 111, 216, 0.02), rgba(29, 111, 216, 0.02)),
+                linear-gradient(160deg, var(--page-bg-start), var(--page-bg-end));
+            overflow: hidden;
+        }
+
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        body::before {
+            background:
+                linear-gradient(var(--line-soft) 1px, transparent 1px),
+                linear-gradient(90deg, var(--line-soft) 1px, transparent 1px),
+                linear-gradient(115deg, transparent 0 34%, rgba(255, 255, 255, 0.38) 50%, transparent 66%),
+                linear-gradient(295deg, transparent 0 38%, rgba(255, 255, 255, 0.28) 50%, transparent 62%),
+                linear-gradient(90deg, transparent 0 44%, rgba(29, 111, 216, 0.08) 50%, transparent 56%);
+            background-size: 46px 46px, 46px 46px, 100% 100%, 100% 100%, 280px 100%;
+            mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.46), transparent 78%);
+            opacity: 0.52;
+        }
+
+        body::after {
+            background:
+                radial-gradient(circle at 50% 22%, rgba(255, 255, 255, 0.86), transparent 20%),
+                radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.46), transparent 42%),
+                linear-gradient(90deg, transparent 0 30%, var(--beam-soft) 50%, transparent 70%),
+                linear-gradient(180deg, transparent 0 28%, var(--beam-strong) 50%, transparent 72%);
+            opacity: 0.9;
+            animation: ambientBreath 18s ease-in-out infinite;
+        }
+
+        .layout {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .layout::before,
+        .layout::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            border-radius: 50%;
+        }
+
+        .layout::before {
+            width: 560px;
+            height: 560px;
+            border: 1px solid rgba(29, 111, 216, 0.08);
+            box-shadow:
+                0 0 0 28px rgba(29, 111, 216, 0.03),
+                0 0 0 92px rgba(29, 111, 216, 0.025);
+            opacity: 0.64;
+            animation: ringBreath 16s ease-in-out infinite;
+        }
+
+        .layout::after {
+            width: 860px;
+            height: 860px;
+            background:
+                conic-gradient(from 90deg, transparent 0 18%, rgba(29, 111, 216, 0.06) 25%, transparent 32%, transparent 58%, rgba(29, 111, 216, 0.05) 66%, transparent 74%);
+            filter: blur(10px);
+            opacity: 0.5;
+            animation: spinSoft 60s linear infinite;
+        }
+
+        .glow {
+            position: absolute;
+            width: 680px;
+            height: 680px;
+            border-radius: 50%;
+            background:
+                radial-gradient(circle, rgba(94, 135, 182, 0.14), rgba(94, 135, 182, 0.03) 48%, transparent 72%);
+            filter: blur(8px);
+            opacity: 0.72;
+            animation: ambientFloat 18s ease-in-out infinite;
+        }
+
+        .panel {
+            position: relative;
+            width: min(320px, 100%);
+        }
+
+        .halo {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 380px;
+            height: 380px;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(29, 111, 216, 0.14), rgba(29, 111, 216, 0.03) 42%, transparent 72%);
+            pointer-events: none;
+            filter: blur(10px);
+            opacity: 0.85;
+            animation: haloBreath 14s ease-in-out infinite;
+        }
+
+        .body {
+            position: relative;
+            padding: 32px 20px;
+            text-align: center;
+        }
+
+        .loader {
+            position: relative;
+            width: 118px;
+            height: 84px;
+            margin: 0 auto 22px;
+            z-index: 1;
+        }
+
+        .loader::before,
+        .loader::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 24px;
+        }
+
+        .loader::before {
+            border: 1px solid rgba(29, 111, 216, 0.18);
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(233, 241, 250, 0.36)),
+                linear-gradient(90deg, rgba(29, 111, 216, 0.04), transparent 28%, transparent 72%, rgba(29, 111, 216, 0.04));
+            box-shadow:
+                inset 0 0 0 1px rgba(255, 255, 255, 0.55),
+                0 0 26px rgba(29, 111, 216, 0.08);
+        }
+
+        .loader::after {
+            inset: 10px;
+            border: 1px solid rgba(29, 111, 216, 0.14);
+            background:
+                linear-gradient(var(--line-soft) 1px, transparent 1px),
+                linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+            background-size: 18px 18px, 18px 18px;
+            opacity: 0.72;
+        }
+
+        .loader-grid,
+        .loader-scan,
+        .loader-bars {
+            position: absolute;
+            z-index: 1;
+        }
+
+        .loader-grid {
+            inset: 10px;
+            border-radius: 18px;
+            background:
+                linear-gradient(90deg, transparent 0 12%, rgba(29, 111, 216, 0.06) 20%, transparent 28%),
+                linear-gradient(180deg, transparent 0 10%, rgba(29, 111, 216, 0.05) 22%, transparent 34%);
+            opacity: 0.7;
+        }
+
+        .loader-scan {
+            left: 18px;
+            right: 18px;
+            top: 24px;
+            height: 2px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, transparent, rgba(29, 111, 216, 0.2) 18%, rgba(29, 111, 216, 0.88) 50%, rgba(29, 111, 216, 0.2) 82%, transparent);
+            box-shadow: 0 0 14px rgba(29, 111, 216, 0.2);
+            animation: scanSweep 3.4s ease-in-out infinite;
+        }
+
+        .loader-bars {
+            left: 50%;
+            bottom: 22px;
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            transform: translateX(-50%);
+        }
+
+        .loader-bars span {
+            display: block;
+            width: 10px;
+            border-radius: 999px;
+            background: linear-gradient(180deg, rgba(29, 111, 216, 0.95), rgba(29, 111, 216, 0.35));
+            box-shadow: 0 0 12px rgba(29, 111, 216, 0.18);
+            animation: barPulse 1.6s ease-in-out infinite;
+        }
+
+        .loader-bars span:nth-child(1) {
+            height: 16px;
+            animation-delay: 0s;
+        }
+
+        .loader-bars span:nth-child(2) {
+            height: 28px;
+            animation-delay: 0.2s;
+        }
+
+        .loader-bars span:nth-child(3) {
+            height: 20px;
+            animation-delay: 0.4s;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 34px;
+            font-weight: 700;
+            line-height: 1.25;
+            letter-spacing: 0.6px;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes spinSoft {
+            to {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        @keyframes spinReverseSoft {
+            to {
+                transform: translate(-50%, -50%) rotate(-360deg);
+            }
+        }
+
+        @keyframes ambientBreath {
+            0%, 100% {
+                opacity: 0.82;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.98;
+                transform: scale(1.015);
+            }
+        }
+
+        @keyframes ambientFloat {
+            0%, 100% {
+                transform: translateY(0);
+                opacity: 0.68;
+            }
+
+            50% {
+                transform: translateY(-8px);
+                opacity: 0.82;
+            }
+        }
+
+        @keyframes haloBreath {
+            0%, 100% {
+                opacity: 0.72;
+                transform: translate(-50%, -50%) scale(0.98);
+            }
+
+            50% {
+                opacity: 0.92;
+                transform: translate(-50%, -50%) scale(1.03);
+            }
+        }
+
+        @keyframes ringBreath {
+            0%, 100% {
+                opacity: 0.54;
+                transform: translate(-50%, -50%) scale(0.985);
+            }
+
+            50% {
+                opacity: 0.72;
+                transform: translate(-50%, -50%) scale(1.015);
+            }
+        }
+
+        @keyframes barPulse {
+            0%, 100% {
+                opacity: 0.64;
+                transform: scaleY(0.8);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scaleY(1.12);
+            }
+        }
+
+        @keyframes scanSweep {
+            0% {
+                transform: translateY(0);
+                opacity: 0.82;
+            }
+
+            50% {
+                transform: translateY(18px);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(36px);
+                opacity: 0.78;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .panel {
+                width: min(100%, 320px);
+            }
+
+            .body {
+                padding: 24px 16px;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+
+            .loader {
+                width: 108px;
+                height: 78px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <div class="glow" aria-hidden="true"></div>
+    <div class="panel">
+        <div class="halo"></div>
+        <div class="body">
+            <div class="loader" aria-hidden="true">
+                <div class="loader-grid"></div>
+                <div class="loader-scan"></div>
+                <div class="loader-bars">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+            <h1>系统启动中</h1>
+        </div>
+    </div>
+</div>
+<script>
+    (function () {
+        var RETRY_INTERVAL_SECONDS = 8;
+        var storageKey = "lcdp.starting.nextRefresh." + window.location.pathname;
+        var now = Date.now();
+        var nextRefreshAt = parseInt(sessionStorage.getItem(storageKey), 10);
+
+        if (!nextRefreshAt || isNaN(nextRefreshAt) || nextRefreshAt <= now) {
+            nextRefreshAt = now + RETRY_INTERVAL_SECONDS * 1000;
+            sessionStorage.setItem(storageKey, String(nextRefreshAt));
+        }
+
+        function tick() {
+            var remainMs = nextRefreshAt - Date.now();
+
+            if (remainMs <= 0) {
+                sessionStorage.setItem(storageKey, String(Date.now() + RETRY_INTERVAL_SECONDS * 1000));
+                window.location.reload();
+            }
+        }
+
+        tick();
+        window.setInterval(tick, 250);
+    })();
+</script>
+</body>
+</html>

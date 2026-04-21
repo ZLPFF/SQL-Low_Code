@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    username: core_pm_test
+    password: core_pm_$test
+    url: jdbc:sqlserver://172.16.156.136:1433;DatabaseName=gikam_core_pm_test
+  profiles:
+    include : sqlserver,audit-trail,logging,ngtodo

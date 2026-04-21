@@ -1,0 +1,1 @@
+System.register(["./sunway-web-ui-vendor-legacy-CdxIiE5Y.js","./index-legacy-CV-pma6K.js"],(function(e,n){"use strict";var t,r;return{setters:[function(e){t=e.e},function(e){r=e.R}],execute:function(){e("r",t(r))}}}));

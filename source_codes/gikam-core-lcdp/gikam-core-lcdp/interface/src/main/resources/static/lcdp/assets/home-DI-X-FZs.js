@@ -1,0 +1,1 @@
+function n(){import.meta.url,import("_").catch((()=>1)),async function*(){}().next()}import"./modulepreload-polyfill-Dqv5PPZA.js";window.IFM_CONTEXT="/sunway",new window.HomeIndexPage({system:"制药实验室信息管理系统",title:"制药实验室信息管理系统",i18n:!0,xIconUrl:"/sunway/assets/img/favicon.ico",loginSuccessUrl:"/sunway/module/index/workspaces"});export{n as __vite_legacy_guard};

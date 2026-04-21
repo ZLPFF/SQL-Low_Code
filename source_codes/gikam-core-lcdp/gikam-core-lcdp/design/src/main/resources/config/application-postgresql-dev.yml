@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    password: lcdp_$dev
+    url: jdbc:postgresql://172.16.156.48:5432/lcdp_dev
+    username: lcdp_dev
+  profiles:
+    include: postgresql,audit-trail,logging,ngtodo

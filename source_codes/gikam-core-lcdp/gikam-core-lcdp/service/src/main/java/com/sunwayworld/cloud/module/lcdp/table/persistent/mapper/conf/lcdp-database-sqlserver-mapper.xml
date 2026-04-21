@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunwayworld.cloud.module.lcdp.table.persistent.mapper.LcdpDatabaseMapper">
+    <select id="selectFieldListByCondition" resultType="map">
+        SELECT T.*
+          FROM (SELECT C.TABLE_NAME TABLENAME,
+                       COALESCE(D.VALUE, '') FIELDCOMMENT,
+                       C.COLUMN_NAME FIELDNAME,
+                       UPPER(C.DATA_TYPE) FIELDTYPE,
+                       CASE C.DATA_TYPE
+                         WHEN 'varchar' THEN
+                          LTRIM(STR(C.CHARACTER_MAXIMUM_LENGTH))
+                         ELSE
+                          ''
+                       END FIELDLENGTH,
+                       CASE C.IS_NULLABLE
+                         WHEN 'YES' THEN
+                          '1'
+                         ELSE
+                          '0'
+                       END ALLOWNULL,
+                       REPLACE(REPLACE(REPLACE(COALESCE(C.COLUMN_DEFAULT, ''), '''', ''), '(', ''), ')', '') DEFAULTVALUE,
+                       C.NUMERIC_PRECISION PRECISION,
+                       C.NUMERIC_SCALE SCALE
+                  FROM SYS.COLUMNS B
+                  LEFT JOIN SYS.EXTENDED_PROPERTIES D
+                    ON D.MAJOR_ID = B.OBJECT_ID
+                   AND D.MINOR_ID = B.COLUMN_ID
+                   AND D.NAME = 'MS_Description'
+                  LEFT JOIN INFORMATION_SCHEMA.COLUMNS C
+                    ON C.COLUMN_NAME = B.NAME
+                   AND B.OBJECT_ID  = OBJECT_ID(C.TABLE_NAME)
+                  LEFT JOIN (SELECT T.NAME TABLE_NAME, T.OBJECT_ID FROM SYS.TABLES T) V
+                    ON B.OBJECT_ID = V.OBJECT_ID
+                   AND C.TABLE_NAME = V.TABLE_NAME
+                    ) T
+        <where>
+            <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendWhereClausesIfPresent"/>
+        </where>
+    </select>
+
+    <select id="selectFieldListByTableName" resultType="map">
+        SELECT C.TABLE_NAME TABLENAME,
+               COALESCE(D.VALUE, '') FIELDCOMMENT,
+               C.COLUMN_NAME FIELDNAME,
+               UPPER(C.DATA_TYPE) FIELDTYPE,
+               CASE C.DATA_TYPE
+                 WHEN 'varchar' THEN
+                  LTRIM(STR(C.CHARACTER_MAXIMUM_LENGTH))
+                 ELSE
+                  ''
+               END FIELDLENGTH,
+               CASE C.IS_NULLABLE
+                 WHEN 'YES' THEN
+                  '1'
+                 ELSE
+                  '0'
+               END ALLOWNULL,
+               REPLACE(REPLACE(REPLACE(COALESCE(C.COLUMN_DEFAULT, ''), '''', ''), '(', ''), ')', '') DEFAULTVALUE,
+               C.NUMERIC_PRECISION PRECISION,
+               C.NUMERIC_SCALE SCALE
+          FROM SYS.COLUMNS B
+          LEFT JOIN SYS.EXTENDED_PROPERTIES D
+            ON D.MAJOR_ID = B.OBJECT_ID
+           AND D.MINOR_ID = B.COLUMN_ID
+           AND D.NAME = 'MS_Description'
+          LEFT JOIN INFORMATION_SCHEMA.COLUMNS C
+            ON C.COLUMN_NAME = B.NAME
+           AND B.OBJECT_ID  = OBJECT_ID(C.TABLE_NAME)
+          LEFT JOIN (SELECT T.NAME TABLE_NAME, T.OBJECT_ID FROM SYS.TABLES T) V
+            ON B.OBJECT_ID = V.OBJECT_ID
+           AND C.TABLE_NAME = V.TABLE_NAME
+         WHERE UPPER(C.TABLE_NAME) = #{tableName}
+    </select>
+
+    <select id="selectIndexListByCondition" resultType="map">
+        SELECT T.*
+          FROM (SELECT B.TABLE_NAME TABLENAME,
+                       A.NAME INDEXNAME,
+                       CASE
+                         WHEN A.IS_PRIMARY_KEY = 1 THEN
+                          '${@com.sunwayworld.cloud.module.lcdp.table.helper.IndexType@primarykey}'
+                         WHEN A.IS_UNIQUE = 1 THEN
+                          '${@com.sunwayworld.cloud.module.lcdp.table.helper.IndexType@unique}'
+                         ELSE
+                          '${@com.sunwayworld.cloud.module.lcdp.table.helper.IndexType@regular}'
+                       END INDEXTYPE,
+                       STUFF((SELECT ',' + C.NAME
+                               FROM SYS.INDEX_COLUMNS B
+                               LEFT JOIN SYS.COLUMNS C
+                                 ON B.OBJECT_ID = C.OBJECT_ID
+                                AND B.COLUMN_ID = C.COLUMN_ID
+                              WHERE A.OBJECT_ID = B.OBJECT_ID
+                                AND A.INDEX_ID = B.INDEX_ID
+                                FOR XML PATH('')),
+                             1,
+                             1,
+                             '') INDEXFIELD
+                  FROM SYS.INDEXES A,
+                       (SELECT T.NAME TABLE_NAME, T.OBJECT_ID FROM SYS.TABLES T) B
+                 WHERE A.OBJECT_ID = B.OBJECT_ID AND A.TYPE_DESC != 'HEAP'
+                    ) T
+        <where>
+            <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendWhereClausesIfPresent"/>
+        </where>
+    </select>
+
+    <select id="selectIndexListByTableName" resultType="map">
+        SELECT B.TABLE_NAME TABLENAME,
+               A.NAME INDEXNAME,
+               CASE
+                 WHEN A.IS_PRIMARY_KEY = 1 THEN
+                  '${@com.sunwayworld.cloud.module.lcdp.table.helper.IndexType@primarykey}'
+                 WHEN A.IS_UNIQUE = 1 THEN
+                  '${@com.sunwayworld.cloud.module.lcdp.table.helper.IndexType@unique}'
+                 ELSE
+                  '${@com.sunwayworld.cloud.module.lcdp.table.helper.IndexType@regular}'
+               END INDEXTYPE,
+               STUFF((SELECT ',' + C.NAME
+                       FROM SYS.INDEX_COLUMNS B
+                       LEFT JOIN SYS.COLUMNS C
+                         ON B.OBJECT_ID = C.OBJECT_ID
+                        AND B.COLUMN_ID = C.COLUMN_ID
+                      WHERE A.OBJECT_ID = B.OBJECT_ID
+                        AND A.INDEX_ID = B.INDEX_ID
+                        FOR XML PATH('')),
+                     1,
+                     1,
+                     '') INDEXFIELD
+          FROM SYS.INDEXES A,
+               (SELECT T.NAME TABLE_NAME, T.OBJECT_ID FROM SYS.TABLES T) B
+         WHERE A.OBJECT_ID = B.OBJECT_ID
+           AND A.TYPE_DESC != 'HEAP'
+           AND UPPER(B.TABLE_NAME) = #{tableName}
+    </select>
+
+    <select id="countByTableName" resultType="int">
+        SELECT COUNT(1)
+          FROM INFORMATION_SCHEMA.TABLES
+         WHERE TABLE_NAME = #{tableName}
+           AND TABLE_TYPE = 'BASE TABLE'
+    </select>
+
+    <select id="countByIndexName" resultType="int">
+        SELECT 0
+    </select>
+
+    <select id="countByViewName" resultType="int">
+        SELECT COUNT(1)
+          FROM INFORMATION_SCHEMA.TABLES
+         WHERE TABLE_NAME = #{viewName}
+           AND TABLE_TYPE = 'VIEW'
+    </select>
+
+    <select id="selectTableInfoByCondition" resultType="map">
+        SELECT T.*
+          FROM (SELECT A.TABLE_NAME TABLENAME, D.VALUE TABLEDESC
+                  FROM (SELECT T.NAME TABLE_NAME, T.OBJECT_ID FROM SYS.TABLES T) A
+                  LEFT JOIN SYS.EXTENDED_PROPERTIES D
+                    ON D.MAJOR_ID = A.OBJECT_ID
+                   AND D.MINOR_ID = 0
+                   AND D.NAME = 'MS_Description') T
+        <where>
+            <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendWhereClausesIfPresent"/>
+        </where>
+        ORDER BY T.TABLENAME
+    </select>
+
+    <select id="selectTableInfoByTableName" resultType="map">
+        SELECT A.TABLE_NAME TABLENAME, D.VALUE TABLEDESC
+          FROM (SELECT T.NAME TABLE_NAME, T.OBJECT_ID FROM SYS.TABLES T) A
+          LEFT JOIN SYS.EXTENDED_PROPERTIES D
+                 ON D.MAJOR_ID = A.OBJECT_ID
+                AND D.MINOR_ID = 0
+                AND D.NAME = 'MS_Description'
+         WHERE UPPER(A.TABLE_NAME) = #{tableName}
+    </select>
+
+    <select id="selectTableNameListByCondition" resultType="map">
+        SELECT T.*
+          FROM (SELECT NAME TABLENAME
+                 FROM SYS.OBJECTS
+                WHERE type='U') T
+        <where>
+            <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendWhereClausesIfPresent"/>
+        </where>
+        ORDER BY T.TABLENAME
+    </select>
+
+    <select id="selectViewInfoListByCondition" resultType="map">
+        SELECT T.*
+          FROM (SELECT UPPER(V.TABLE_NAME) VIEWNAME,
+                       UPPER(V.TABLE_NAME) TABLENAME,
+                       SUBSTRING(V.VIEW_DEFINITION, CHARINDEX(' AS ',UPPER(V.VIEW_DEFINITION)) + 4, LEN(V.VIEW_DEFINITION)) SELECTSTATEMENT
+                  FROM INFORMATION_SCHEMA.VIEWS V
+            ) T
+        <where>
+            <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendWhereClausesIfPresent"/>
+        </where>
+        ORDER BY T.VIEWNAME
+    </select>
+
+    <select id="lockTableByTableName" resultType="map">
+        SELECT * FROM ${tableName} WITH(HOLDLOCK)
+    </select>
+
+    <select id="selectTableOrViewNameListByCondition" resultType="map">
+        SELECT T.*
+          FROM (SELECT NAME TABLEORVIEWNAME,
+                       'table' DBSTRUCTURETYPE
+                  FROM SYS.OBJECTS
+                 WHERE type='U'
+                 UNION
+                SELECT UPPER(V.TABLE_NAME) TABLEORVIEWNAME,
+                       'view' DBSTRUCTURETYPE
+                  FROM INFORMATION_SCHEMA.VIEWS V
+                ) T
+        <where>
+            <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendWhereClausesIfPresent"/>
+        </where>
+        ORDER BY T.TABLEORVIEWNAME
+    </select>
+</mapper>

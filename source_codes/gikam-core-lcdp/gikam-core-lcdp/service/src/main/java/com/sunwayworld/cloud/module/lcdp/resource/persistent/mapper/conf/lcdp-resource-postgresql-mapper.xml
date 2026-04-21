@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunwayworld.cloud.module.lcdp.resource.persistent.mapper.LcdpResourceMapper">
+    <select id="selectByCondition" parameterType="map" resultType="map">
+        <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.selectColumnNames"/>
+          FROM T_LCDP_RESOURCE T
+        <where>
+            <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendWhereClausesIfPresent" />
+            <if test="wf_action_unassigned != null">
+                AND NOT EXISTS (SELECT 1
+                                  FROM T_WORKFLOW_ACTION R
+                                 WHERE R.ACTIONCLAZZCODE = T.PATH)
+            </if>
+        </where>
+        ORDER BY
+        <choose>
+            <when test="orderParams != null and orderParams.size > 0">
+                <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendOrderClause" />
+            </when>
+            <otherwise>
+                T.ID DESC
+            </otherwise>
+        </choose>
+    </select>
+    <select id="selectTreeChildQtyByParentId" parameterType="list" resultType="map">
+        SELECT T.PARENTID , count(1) count FROM T_LCDP_RESOURCE T
+        WHERE DELETEFLAG ='0' AND
+        PARENTID in
+        <foreach collection="parentIdList" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        GROUP BY PARENTID
+    </select>
+
+    <select id="selectPageByCondition" resultType="map">
+        SELECT T.*
+          FROM (SELECT P.ID,
+                       P.PATH,
+                       P.RESOURCENAME,
+                       P.RESOURCEDESC,
+                       CONCAT(M.RESOURCENAME,'(',M.RESOURCEDESC,')') MODULE,
+                       CONCAT(C.RESOURCENAME,'(',C.RESOURCEDESC,')') CATEGORY,
+                       (SELECT STRING_AGG(MENU.MENUNAME,',') FROM T_CORE_MENU MENU WHERE MENU.RESOURCEID = P.ID) MENU
+                  FROM T_LCDP_RESOURCE P
+             LEFT JOIN T_LCDP_RESOURCE M
+                    ON P.PARENTID = M.ID
+             LEFT JOIN T_LCDP_RESOURCE C
+                    ON M.PARENTID = C.ID
+                 WHERE P.RESOURCECATEGORY = 'view'
+                   AND P.DELETEFLAG = '0'
+                   AND P.EFFECTVERSION > 0
+                ) T
+        <where>
+            <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendWhereClausesIfPresent" />
+            <if test='service=="viewButtonRole"'>
+                AND NOT EXISTS (SELECT 1
+                FROM T_LCDP_VIEW_BUTTON_ROLE BR
+                where MENUID = #{menuId} and  RESOURCEID = T.ID
+                )
+            </if>
+        </where>
+        ORDER BY
+        <choose>
+            <when test="orderParams != null and orderParams.size > 0">
+                <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendOrderClause" />
+            </when>
+            <otherwise>
+                T.ID DESC
+            </otherwise>
+        </choose>
+    </select>
+    
+    <select id="selectPathListByResourceName" resultType="java.lang.String">
+        SELECT DISTINCT PATH
+          FROM T_LCDP_RESOURCE
+         WHERE RESOURCENAME = #{resourceName}
+           AND RESOURCECATEGORY = 'java'
+           AND DELETEFLAG = '0'
+    </select>
+
+    <select id="selectReferencedList" resultType="map">
+        SELECT ID,
+               PATH,
+               RESOURCENAME,
+               RESOURCEDESC,
+               RESOURCECATEGORY
+          FROM T_LCDP_RESOURCE
+         WHERE DELETEFLAG = '0'
+           AND CONTENT LIKE '%${path}%'
+           AND PATH != '${path}'
+         ORDER BY PATH
+    </select>
+    
+    <select id="selectTreeSearchList" resultType="map">
+        SELECT
+        <choose>
+            <when test="columns != null">
+                ${columns}
+            </when>
+            <otherwise>
+                *
+            </otherwise>
+        </choose>
+          FROM T_LCDP_RESOURCE
+         WHERE DELETEFLAG = '0'
+           AND UPPER(CAST(RESOURCENAME AS VARCHAR)) LIKE '%' || #{resourceName} || '%'
+    </select>
+    
+    <select id="selectTreeCheckoutLeafNodeList" resultType="map">
+        SELECT R.ID,
+               R.RESOURCENAME,
+               R.PARENTID,
+               R.CATEGORYID,
+               R.MODULEID,
+               R.EFFECTVERSION, /* 生效版本 */
+               R.CREATEDBYID, /* 创建人编码 */
+               R.CHECKOUTUSERID, /* 检出人编码 */
+               R.CHECKOUTTIME /* 检出人时间 */
+          FROM T_LCDP_RESOURCE R
+         WHERE R.RESOURCECATEGORY IN ('java', 'mapper', 'view', 'js')
+           AND R.DELETEFLAG = '0'
+           AND R.CHECKOUTUSERID IS NOT NULL
+         <if test="categoryIdList != null">
+           AND R.CATEGORYID IN
+           <foreach collection="categoryIdList" item="categoryId" separator=", " open="(" close=")">
+               ${categoryId}
+           </foreach>
+         </if>
+    </select>
+    
+    <select id="selectTreeErrorLeafNodeList" resultType="map">
+        SELECT R.ID,
+               R.RESOURCENAME,
+               R.PARENTID,
+               R.CATEGORYID,
+               R.MODULEID,
+               R.EFFECTVERSION, /* 生效版本 */
+               R.CREATEDBYID, /* 创建人编码 */
+               S.SCRIPTSTATUS ERRORSTATUS /* 编译失败，脚本状态 */
+          FROM T_LCDP_RESOURCE R, T_LCDP_ERROR_SCRIPT S
+         WHERE R.ID = S.SERVERSCRIPTID
+           AND R.RESOURCECATEGORY IN ('java', 'mapper', 'view', 'js')
+           AND R.DELETEFLAG = '0'
+         <if test="categoryIdList != null">
+           AND R.CATEGORYID IN
+           <foreach collection="categoryIdList" item="categoryId" separator=", " open="(" close=")">
+               ${categoryId}
+           </foreach>
+         </if>
+    </select>
+    
+    <select id="selectPageServiceList" resultType="map">
+        SELECT R.ID,
+               R.EFFECTVERSION,
+               R.PATH
+          FROM T_LCDP_RESOURCE R
+         WHERE R.RESOURCECATEGORY = 'java'
+           AND R.DELETEFLAG = '0'
+         <if test='userId != "sysAdmin"'>
+           AND (R.EFFECTVERSION > 0 
+                OR EXISTS (SELECT 1
+                             FROM T_LCDP_RS_CHECKOUT_RECORD C
+                            WHERE R.ID = C.RESOURCEID
+                              AND C.CHECKOUTUSERID = #{loginUser.id}))
+         </if>
+         ORDER BY R.PATH
+    </select>
+    
+    <select id="selectVisibleModuleList" resultType="map">
+        SELECT R.ID,
+               R.PARENTID
+          FROM T_LCDP_RESOURCE R
+         WHERE R.RESOURCECATEGORY = 'module'
+         <if test='excludeDeleted'>
+           AND R.DELETEFLAG = '0'
+         </if>
+         <if test='userId != "sysAdmin"'>
+           AND R.CREATEDBYID = #{userId}
+         UNION ALL
+        SELECT R.ID,
+               R.PARENTID
+          FROM T_LCDP_RESOURCE R
+         WHERE R.RESOURCECATEGORY = 'module'
+         <if test='excludeDeleted'>
+           AND R.DELETEFLAG = '0'
+         </if>
+           AND EXISTS (SELECT 1
+                         FROM T_LCDP_RESOURCE SR
+                        WHERE SR.PARENTID = R.ID
+                          AND (SR.EFFECTVERSION > 0
+                               OR SR.CREATEDBYID = #{userId}))
+         </if>
+    </select>
+    
+    <select id="selectCheckoutableModuleList" resultType="map">
+        SELECT DISTINCT R.MODULEID ID,
+                        R.CATEGORYID PARENTID
+          FROM T_LCDP_RESOURCE R
+         WHERE R.RESOURCECATEGORY IN ('java', 'mapper', 'view', 'js')
+           AND R.DELETEFLAG = '0'
+           AND R.CHECKOUTUSERID IS NULL
+         <if test="categoryIdList != null">
+           AND R.CATEGORYID IN
+           <foreach collection="categoryIdList" item="categoryId" separator=", " open="(" close=")">
+               ${categoryId}
+           </foreach>
+         </if>
+    </select>
+    
+    <select id="selectCheckoutableResourceList" resultType="map">
+        SELECT R.*
+          FROM T_LCDP_RESOURCE R
+         WHERE R.RESOURCECATEGORY IN ('java', 'mapper', 'view', 'js')
+           AND R.DELETEFLAG = '0'
+           AND R.EFFECTVERSION > 0
+           AND R.CHECKOUTUSERID IS NULL
+         <if test="moduleIdList != null">
+           AND R.MODULEID IN
+           <foreach collection="moduleIdList" item="moduleId" separator=", " open="(" close=")">
+               ${moduleId}
+           </foreach>
+         </if>
+    </select>
+    
+    <select id="selectSubmittableResourceList" resultType="map">
+        <choose>
+            <when test="columns != null">
+                SELECT ${columns}
+            </when>
+            <otherwise>
+                SELECT R.*
+            </otherwise>
+        </choose>
+          FROM T_LCDP_RESOURCE R
+         WHERE R.RESOURCECATEGORY IN ('java', 'mapper', 'view', 'js')
+           AND R.DELETEFLAG = '0'
+           AND R.CHECKOUTUSERID = #{userId}
+           AND EXISTS (SELECT 1
+                         FROM T_LCDP_RS_CHECKOUT_RECORD C
+                        WHERE R.ID = C.RESOURCEID
+                          AND C.CHECKOUTUSERID = #{userId})
+    </select>
+    
+    <select id="selectToBeCopiedMapperList" resultType="map">
+        SELECT *
+          FROM T_LCDP_RESOURCE R
+         WHERE R.RESOURCENAME LIKE '%${fromSuffix}'
+           AND R.EFFECTVERSION > 0
+           AND R.DELETEFLAG = '0'
+           AND NOT EXISTS (SELECT 1
+                             FROM T_LCDP_RESOURCE TR
+                            WHERE TR.RESOURCENAME LIKE '%${toSuffix}'
+                              AND TR.PARENTID = R.PARENTID
+                              AND REPLACE(R.RESOURCENAME, '${fromSuffix}', '${toSuffix}') = TR.RESOURCENAME
+                              AND TR.DELETEFLAG = '0')
+    </select>
+    
+    <select id="selectCheckoutedList" resultType="map">
+        SELECT R.ID,
+               R.RESOURCENAME,
+               R.RESOURCEDESC,
+               R.RESOURCECATEGORY,
+               R.PARENTID,
+               R.CATEGORYID,
+               R.MODULEID,
+               R.PATH,
+               R.DELETEFLAG,
+               R.EFFECTVERSION,
+               R.CREATEDBYID,
+               R.CHECKOUTUSERID,
+               R.CHECKOUTTIME,
+               U.USERNAME CHECKOUTUSERNAME
+          FROM T_LCDP_RESOURCE R, T_CORE_USER U
+         WHERE R.CHECKOUTUSERID = U.ID
+           AND R.RESOURCECATEGORY IN ('java', 'mapper', 'view', 'js')
+           AND R.DELETEFLAG = '0'
+    </select>
+
+    <select id="selectJavaByKeyword" resultType="map">
+        SELECT H.ID,
+        R.ID RESOURCEID,
+        R.RESOURCENAME,
+        R.RESOURCECATEGORY,
+        R.PATH,
+        H.VERSION
+        FROM T_LCDP_RESOURCE_HISTORY H, T_LCDP_RESOURCE R
+        WHERE H.RESOURCEID = R.ID
+        AND ((R.CHECKOUTUSERID = #{userId} AND H.SUBMITFLAG = 'no')
+        OR ((R.CHECKOUTUSERID IS NULL OR R.CHECKOUTUSERID != #{userId}) AND H.EFFECTFLAG = 'yes'))
+        AND H.DELETEFLAG = '0'
+        AND H.RESOURCECATEGORY = 'java'
+        <choose>
+            <when test="matchCase == 1">
+                AND CAST(H.CONTENT AS VARCHAR) LIKE ('%' || #{keyword} || '%')
+            </when>
+            <otherwise>
+                AND UPPER(CAST(H.CONTENT AS VARCHAR)) LIKE ('%' || #{keyword} || '%')
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="selectJavascriptByKeyword" resultType="map">
+        SELECT H.ID,
+               R.ID RESOURCEID,
+               R.RESOURCENAME,
+               R.RESOURCECATEGORY,
+               R.PATH,
+               H.VERSION
+          FROM T_LCDP_RESOURCE_HISTORY H, T_LCDP_RESOURCE R
+         WHERE H.RESOURCEID = R.ID
+          AND ((R.CHECKOUTUSERID = #{userId} AND H.SUBMITFLAG = 'no')
+               OR ((R.CHECKOUTUSERID IS NULL OR R.CHECKOUTUSERID != #{userId}) AND H.EFFECTFLAG = 'yes'))
+          AND H.DELETEFLAG = '0'
+          AND (H.RESOURCECATEGORY = 'view' OR H.RESOURCECATEGORY = 'js')
+        <choose>
+            <when test="matchCase == 1">
+                AND CAST(H.CONTENT AS VARCHAR) LIKE ('%' || #{keyword} || '%')
+            </when>
+            <otherwise>
+                AND UPPER(CAST(H.CONTENT AS VARCHAR)) LIKE ('%' || #{keyword} || '%')
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="selectMapperByKeyword" resultType="map">
+        SELECT H.ID,
+        R.ID RESOURCEID,
+        R.RESOURCENAME,
+        R.RESOURCECATEGORY,
+        R.PATH,
+        H.VERSION
+        FROM T_LCDP_RESOURCE_HISTORY H, T_LCDP_RESOURCE R
+        WHERE H.RESOURCEID = R.ID
+        AND ((R.CHECKOUTUSERID = #{userId} AND H.SUBMITFLAG = 'no')
+        OR ((R.CHECKOUTUSERID IS NULL OR R.CHECKOUTUSERID != #{userId}) AND H.EFFECTFLAG = 'yes'))
+        AND H.DELETEFLAG = '0'
+        AND H.RESOURCECATEGORY = 'mapper'
+        <if test='mapperSuffix != ""'>
+            AND H.RESOURCENAME LIKE '%${mapperSuffix}'
+        </if>
+        <choose>
+            <when test="matchCase == 1">
+                AND CAST(H.CONTENT AS VARCHAR) LIKE ('%' || #{keyword} || '%')
+            </when>
+            <otherwise>
+                AND UPPER(CAST(H.CONTENT AS VARCHAR)) LIKE ('%' || #{keyword} || '%')
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="selectCompByKeyword" resultType="map">
+        SELECT C.ID,
+        R.ID RESOURCEID,
+        R.RESOURCENAME,
+        'comp' RESOURCECATEGORY,
+        R.PATH,
+        H.VERSION,
+        C.CONFIG CONTENT
+        FROM T_LCDP_RESOURCE_HISTORY H, T_LCDP_RESOURCE R, T_LCDP_MODULE_PAGE_COMP C
+        WHERE H.RESOURCEID = R.ID
+        AND ((R.CHECKOUTUSERID = #{userId} AND H.SUBMITFLAG = 'no')
+        OR ((R.CHECKOUTUSERID IS NULL OR R.CHECKOUTUSERID != #{userId}) AND H.EFFECTFLAG = 'yes'))
+        AND H.DELETEFLAG = '0'
+        AND H.RESOURCECATEGORY = 'view'
+        AND C.MODULEPAGEHISTORYID = H.ID
+        <choose>
+            <when test="matchCase == 1">
+                AND CAST(C.CONFIG AS VARCHAR) LIKE ('%' || #{keyword} || '%')
+            </when>
+            <otherwise>
+                AND UPPER(CAST(C.CONFIG AS VARCHAR)) LIKE ('%' || #{keyword} || '%')
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <select id="selectMoveOutModuleList" resultType="map">
+        SELECT DISTINCT R.MODULEID ID,
+                        R.CATEGORYID PARENTID
+          FROM T_LCDP_RESOURCE R
+         WHERE R.RESOURCECATEGORY IN ('java', 'mapper', 'view', 'js')
+           AND R.EFFECTVERSION > 0
+         <if test="categoryIdList != null">
+           AND R.CATEGORYID IN
+           <foreach collection="categoryIdList" item="categoryId" separator=", " open="(" close=")">
+               ${categoryId}
+           </foreach>
+         </if>
+    </select>
+    
+    <select id="selectIdAndParentIdList" resultType="map">
+        SELECT ID,
+               PARENTID
+          FROM T_LCDP_RESOURCE
+         ORDER BY ID ASC
+    </select>
+
+
+    <select id="selectEffectIdList" resultType="map">
+        SELECT ID,EFFECTVERSION
+        PARENTID
+        FROM T_LCDP_RESOURCE WHERE EFFECTVERSION > 0 AND DELETEFLAG = '0'
+        ORDER BY ID ASC
+    </select>
+</mapper>

@@ -1,0 +1,10 @@
+server:
+  port: 8182
+spring:
+  datasource:
+    driver-class-name: oracle.jdbc.OracleDriver
+    username: lcdp_dev
+    password: lcdp_$dev
+    url: jdbc:oracle:thin:@172.16.156.42:1521/orcl
+  profiles:
+    include: dev,oracle,audit,logging,ngtodo,schedule

@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://172.16.156.48:5432/lims_api_test
+    username: lims_api_test
+    password: lims_api_$test
+  profiles:
+    include: dev,postgresql,audit,schedule,logging,ngtodo

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunwayworld.cloud.module.lcdp.base.persistent.mapper.LcdpBaseMapper">
+    <select id="selectByCondition" parameterType="map" resultType="map">
+        SELECT T.*
+          FROM (${sql}) T
+        <where>
+            <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendWhereClausesIfPresent" />
+            <include refid="auditAuthorityWhereClause"/>
+        </where>
+        <if test="orderParams != null and orderParams.size > 0">
+            ORDER BY <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendOrderClause" />
+        </if>
+    </select>
+
+    <sql id="auditAuthorityWhereClause">
+        <if test=' bpAuthority == "1" and bpNodeCode != null and bpCode != null '>
+                AND EXISTS (SELECT 1
+                              FROM T_LCDP_BP_INST I, T_LCDP_BP_INST_NODE K, T_LCDP_BP_INST_NODE_ROLE R, T_CORE_ROLE_USER U
+                             WHERE I.ID = K.BPINSTID
+                               AND I.BPCODE = #{bpCode}
+                               AND I.BIZID = T.ID
+                               AND K.ID = R.BPINSTNODEID
+                               AND R.ROLEID = U.ROLEID
+                               AND K.BPNODECODE = #{bpNodeCode}
+                               AND U.USERID = #{loginUser.id}
+                         UNION ALL
+                            SELECT 1
+                              FROM T_LCDP_BP_INST I, T_LCDP_BP_INST_NODE K, T_LCDP_BP_INST_NODE_USER U
+                             WHERE I.ID = K.BPINSTID
+                               AND I.BPCODE = #{bpCode}
+                               AND I.BIZID = T.ID
+                               AND K.ID = U.BPINSTNODEID
+                               AND K.BPNODECODE = #{bpNodeCode}
+                               AND U.USERID = #{loginUser.id})
+                AND NOT EXISTS (SELECT 1
+                                  FROM T_LCDP_BP_BIZ_SIGN_USER U
+                                 WHERE U.BPCODE = #{bpCode}
+                                   AND U.BPNODECODE = #{bpNodeCode}
+                                   AND U.BIZID = T.ID
+                                   AND U.USERID = #{loginUser.id})
+        </if>
+    </sql>
+</mapper>

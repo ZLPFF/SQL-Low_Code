@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    username: lcdp_dev
+    password: lcdp_$dev
+    url: jdbc:sqlserver://172.16.156.136:1433;DatabaseName=lcdp_dev
+  profiles:
+    include : sqlserver,audit-trail,logging,ngtodo

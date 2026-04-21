@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    driver-class-name: oracle.jdbc.OracleDriver
+    username: lcdp_test
+    password: lcdp_$test
+    url: jdbc:oracle:thin:@172.16.156.42:1521/orcl
+  profiles:
+    include: dev,oracle,audit,logging,ngtodo

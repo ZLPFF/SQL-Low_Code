@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset=UTF-8 />
+<meta name=viewport content="width=device-width,initial-scale=0.6,minimum-scale=0.6,maximum-scale=0.6,user-scalable=no" />
+<meta http-equiv=X-UA-Compatible content="ie=edge" />
+
+<th:block th:replace="module/gikam/context" />
+
+<link th:href="@{/static/gikam/main/css/chunk-common.css}" rel="stylesheet" />
+<link th:href="@{/static/gikam/main/css/chunk-vendors.css}" rel="stylesheet" />
+<link th:href="@{/static/gikam/main/css/workspace.css}" rel="stylesheet" />
+<link th:href="@{/static/gikam/extend/css/extend.css}" rel="stylesheet" />
+
+</head>
+
+<body>
+    <script th:src="@{/static/gikam/main/js/chunk-vendors.js}"></script>
+    <script th:src="@{/static/gikam/main/js/chunk-common.js}"></script>
+    <script th:src="@{/static/gikam/main/js/workspace.js}"></script>
+    <script th:src="@{/static/gikam/extends/gikam-extend.js}"></script>
+    <script th:src="@{/static/gikam/extend/js/chunk-vendors.js}"></script>
+    <script th:src="@{/static/gikam/extend/js/extend.js}"></script>
+    <script th:src="@{/static/module/lcdp/extends/lcdp-extend.js}"></script>
+
+    <th:block th:replace="module/gikam/gikam-config" />
+</body>
+
+</html>

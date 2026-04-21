@@ -1,0 +1,1 @@
+System.register(["./modulepreload-polyfill-legacy-thrsW4a0.js"],(function(e,s){"use strict";return{setters:[null],execute:function(){var e="/sunway";window.IFM_CONTEXT=e,new window.HomeIndexPage({system:"制药实验室信息管理系统",title:"制药实验室信息管理系统",i18n:!0,xIconUrl:"/sunway/assets/img/favicon.ico",loginSuccessUrl:"/sunway/module/index/workspaces"})}}}));

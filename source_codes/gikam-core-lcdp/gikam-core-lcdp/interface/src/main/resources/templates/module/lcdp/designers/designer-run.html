@@ -1,0 +1,13 @@
+
+<th:block th:replace="module/gikam/single" />
+
+<script th:inline="javascript">
+
+(function() {
+    var param = Gikam.getElParam([[${param}]]);
+    Gikam.isLcdpDevEnv = true;
+    Gikam.locale = param.locale;
+    new IndexPage({url: param.id});
+})()
+
+</script>

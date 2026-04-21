@@ -1,0 +1,9 @@
+<script th:inline="javascript">
+/*<![CDATA[*/
+    Gikam.requirejs([ '/static/module/lcdp/view-button-roles/lcdp-view-button-role.js',
+                      '/static/module/lcdp/view-button-roles/lcdp-view-button-role-choose-list.js'
+                    ]);
+    lcdpViewButtonRole.choosePage.init(Gikam.getElParam([[${param}]]));
+/*]]>*/
+</script>
+

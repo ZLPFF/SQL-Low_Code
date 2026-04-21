@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunwayworld.cloud.module.lcdp.table.persistent.mapper.LcdpViewMapper">
+    <select id="selectByCondition" parameterType="map" resultType="map">
+        SELECT T.*
+        FROM T_LCDP_VIEW T
+        <where>
+            <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendWhereClausesIfPresent"/>
+        </where>
+        ORDER BY
+        <choose>
+            <when test="orderParams != null and orderParams.size > 0">
+                <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendOrderClause"/>
+            </when>
+            <otherwise>
+                T.ID DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="selectLatestBriefList" parameterType="map" resultType="map">
+        SELECT T.ID,
+               T.VIEWNAME,
+               T.VIEWDESC,
+               T.VERSION,
+               T.SUBMITFLAG,
+               T.CREATEDBYID
+          FROM T_LCDP_VIEW T
+        <where>
+           <if test="viewList != null">
+               T.VIEWNAME IN
+               <foreach collection="viewList" item="view" open="(" close=")" separator=",">
+                   '${view}'
+               </foreach>
+           </if>
+           <if test="submitted != null"> <!-- 查询已提交过的 -->
+               AND EXISTS (SELECT 1 FROM T_LCDP_VIEW TT WHERE TT.VIEWNAME = T.TABLENAME AND TT.SUBMITFLAG = 'yes')
+           </if>
+           AND NOT EXISTS (SELECT 1 FROM T_LCDP_VIEW TT WHERE TT.VIEWNAME = T.TABLENAME AND TT.VERSION > T.VERSION)
+            <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendWhereClausesIfPresent"/>
+        </where>
+    </select>
+</mapper>

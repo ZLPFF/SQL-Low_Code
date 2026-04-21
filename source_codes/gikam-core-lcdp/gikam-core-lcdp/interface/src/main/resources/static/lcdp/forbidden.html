@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>低代码开发平台</title>
+
+        <style>
+            .alert {
+                background-color: #fffbe6;
+                border: 1px solid #ffe58f;
+                box-sizing: border-box;
+                margin: 0;
+                padding: 8px 12px;
+                color: rgba(0, 0, 0, 0.88);
+                font-size: 14px;
+                line-height: 1.5714285714285714;
+                list-style: none;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
+                    sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+                position: relative;
+                display: flex;
+                align-items: flex-start;
+                word-wrap: break-word;
+                border-radius: 8px;
+                padding-block: 20px;
+            }
+
+            .alert-message {
+                display: block;
+                margin-bottom: 8px;
+                color: rgba(0, 0, 0, 0.88);
+                font-size: 16px;
+            }
+
+            .alert-icon {
+                color: #faad14;
+                margin-inline-end: 12px;
+                font-size: 24px;
+                line-height: 0;
+                margin-top: 2px;
+            }
+        </style>
+    </head>
+    <body>
+        <div role="alert" class="alert">
+            <span role="img" aria-label="exclamation-circle" class="alert-icon">
+                <svg
+                    focusable="false"
+                    data-icon="exclamation-circle"
+                    width="1em"
+                    height="1em"
+                    fill="currentColor"
+                    aria-hidden="true"
+                    viewBox="64 64 896 896"
+                >
+                    <path
+                        d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"
+                    ></path>
+                    <path
+                        d="M464 688a48 48 0 1096 0 48 48 0 10-96 0zm24-112h48c4.4 0 8-3.6 8-8V296c0-4.4-3.6-8-8-8h-48c-4.4 0-8 3.6-8 8v272c0 4.4 3.6 8 8 8z"
+                    ></path>
+                </svg>
+            </span>
+            <div class="alert-content">
+                <div class="alert-message">提示</div>
+                <div class="alert-description">您无权限访问该页面，请联系管理员！</div>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunwayworld.cloud.module.lcdp.resource.persistent.mapper.LcdpModulePageI18nMapper">
+    <select id="selectByCondition" parameterType="map" resultType="map">
+        SELECT T.*
+          FROM T_LCDP_MODULE_PAGE_I18N T
+        <where>
+            <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendWhereClausesIfPresent" />
+        </where>
+        ORDER BY
+        <choose>
+            <when test="orderParams != null and orderParams.size > 0">
+                <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendOrderClause" />
+            </when>
+            <otherwise>
+                T.ID DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="selectEffectiveByCondition" parameterType="map" resultType="map">
+        SELECT T.*
+        FROM (
+            SELECT M.* ,C.LOCALENAME
+             FROM T_LCDP_MODULE_PAGE_I18N M, T_LCDP_RESOURCE_HISTORY H, T_CORE_I18N_CONFIG C,T_LCDP_RESOURCE R
+            WHERE H.ID = M.MODULEPAGEHISTORYID AND H.RESOURCEID = R.ID
+              AND M.I18NCONFIGID = C.ID
+              AND R.DELETEFLAG = '0'
+              AND H.EFFECTFLAG = 'yes'
+         ) T
+        <where>
+            <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendWhereClausesIfPresent" />
+        </where>
+        ORDER BY
+        <choose>
+            <when test="orderParams != null and orderParams.size > 0">
+                <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendOrderClause" />
+            </when>
+            <otherwise>
+                T.ID DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="selectAllI18nMessage" parameterType="map" resultType="map">
+        SELECT T.*
+          FROM (SELECT I.ID,
+                       I.CODE ,
+                       I.DESCRIPTION ,
+                       I.DEFAULTMESSAGE ,
+                       0 MODULEPAGEHISTORYID,
+                       <choose>
+                           <when test="@com.sunwayworld.framework.database.dialect.DialectRepository@isKingbase()">
+                               STRING_AGG(I18N.PATH, ',' ORDER BY I.CODE) AS PATH
+                           </when>
+                           <otherwise>
+                               TRIM(TRAILING ',' FROM XMLAGG(XMLPARSE(CONTENT I18N.PATH || ','WELLFORMED) ORDER BY I.CODE).GETCLOBVAL()) PATH
+                           </otherwise>
+                       </choose>
+                  FROM(SELECT I18N.ID,
+                              I18N.CODE ,
+                              I18N.DESCRIPTION ,
+                              I18N.DEFAULTMESSAGE
+                         FROM T_CORE_I18N I18N
+                    LEFT JOIN T_CORE_I18N_MESSAGE I18NM
+                           ON I18N.ID = I18NM.I18NID
+                           <where>
+                               <if test='localeId != null and localeId != ""'>
+                                   AND I18NM.I18NCONFIGID LIKE '%' || #{localeId} || '%'
+                               </if>
+                               <if test='message != null and message != ""'>
+                                   AND I18NM.MESSAGE LIKE '%' || #{message} || '%'
+                               </if>
+                               <if test='description != null and description != ""'>
+                                   AND I18N.DESCRIPTION LIKE '%' || #{description} || '%'
+                               </if>
+                               <if test='code != null and code != ""'>
+                                   AND I18N.CODE LIKE '%' || #{code} || '%'
+                               </if>
+                           </where>
+                     GROUP BY I18N.ID,I18N.CODE,I18N.DESCRIPTION,I18N.DEFAULTMESSAGE) I
+                    LEFT JOIN
+                    (SELECT I18NC.CODE,
+                            H.PATH
+                       FROM T_LCDP_PAGE_I18N_CODE I18NC, T_LCDP_RESOURCE_HISTORY H,T_LCDP_RESOURCE R
+                            <where>
+                                H.ID = I18NC.MODULEPAGEHISTORYID AND
+                                H.RESOURCEID = R.ID
+                                AND R.DELETEFLAG = '0'
+                                AND ((H.EFFECTFLAG = 'yes'
+                                       AND NOT EXISTS (SELECT 1
+                                                        FROM T_LCDP_RESOURCE_LOCK L
+                                                       WHERE L.RESOURCEID = TO_CHAR(H.RESOURCEID)
+                                                         AND L.LOCKUSERID = #{loginUser.id}))
+                                       OR (H.EFFECTFLAG = 'no'
+                                           AND EXISTS (SELECT 1
+                                                        FROM T_LCDP_RESOURCE_LOCK L
+                                                       WHERE L.RESOURCEID = TO_CHAR(H.RESOURCEID)
+                                                         AND L.LOCKUSERID = #{loginUser.id})))
+                                <if test='path != null and path != ""'>
+                                    AND H.PATH LIKE '%' || #{path} || '%'
+                                </if>
+                            </where>
+                    )I18N
+                    ON I.CODE = I18N.CODE
+            GROUP BY I.ID,I.CODE,I.DESCRIPTION,I.DEFAULTMESSAGE
+         UNION ALL
+            SELECT 0 ID ,
+                   I18NM.CODE ,
+                   NULL DESCRIPTION ,
+                   NULL DEFAULTMESSAGE ,
+                   I18NM.MODULEPAGEHISTORYID,
+                   <choose>
+                       <when test="@com.sunwayworld.framework.database.dialect.DialectRepository@isKingbase()">
+                           H.PATH AS PATH
+                       </when>
+                       <otherwise>
+                           TO_CLOB(H.PATH)
+                       </otherwise>
+                   </choose>
+              FROM T_LCDP_MODULE_PAGE_I18N I18NM
+         LEFT JOIN T_LCDP_RESOURCE_HISTORY H
+                ON H.ID = I18NM.MODULEPAGEHISTORYID
+         JOIN T_LCDP_RESOURCE R
+                on H.RESOURCEID = R.ID
+        AND R.DELETEFLAG = '0'
+             WHERE ((H.EFFECTFLAG = 'yes'
+                    AND NOT EXISTS (SELECT 1
+                                     FROM T_LCDP_RESOURCE_LOCK L
+                                    WHERE L.RESOURCEID = TO_CHAR(H.RESOURCEID)
+                                      AND L.LOCKUSERID = #{loginUser.id}))
+                OR (H.EFFECTFLAG = 'no'
+                    AND EXISTS (SELECT 1
+                                 FROM T_LCDP_RESOURCE_LOCK L
+                                WHERE L.RESOURCEID = TO_CHAR(H.RESOURCEID)
+                                  AND L.LOCKUSERID = #{loginUser.id})))
+            <if test='localeId != null and localeId != ""'>
+                AND I18NM.I18NCONFIGID LIKE '%' || #{localeId} || '%'
+            </if>
+            <if test='message != null and message != ""'>
+                AND I18NM.MESSAGE LIKE '%' || #{message} || '%'
+            </if>
+            <if test='description != null and description != ""'>
+                AND 1 = 2
+            </if>
+            <if test='code != null and code != ""'>
+                AND I18NM.CODE LIKE '%' || #{code} || '%'
+            </if>
+            <if test='path != null and path != ""'>
+                AND H.PATH LIKE '%' || #{path} || '%'
+            </if>
+          GROUP BY I18NM.MODULEPAGEHISTORYID,I18NM.CODE,H.PATH
+        ) T
+        ORDER BY T.CODE
+    </select>
+
+</mapper>

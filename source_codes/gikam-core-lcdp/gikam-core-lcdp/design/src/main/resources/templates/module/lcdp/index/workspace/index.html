@@ -1,0 +1,11 @@
+<!-- 引入核心页面 -->
+<th:block th:replace="module/gikam/workspace" />
+<!-- 页面初始化 -->
+<script th:inline="javascript">
+
+    window.workspace = new IndexPage({
+        title : '低代码开发平台',
+        showFullScreen : true,
+
+    });
+</script>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunwayworld.cloud.module.lcdp.errorscript.persistent.mapper.LcdpErrorScriptMapper">
+    <select id="selectByCondition" parameterType="map" resultType="map">
+        SELECT T.*
+          FROM T_LCDP_ERROR_SCRIPT T
+        <where>
+            <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendWhereClausesIfPresent" />
+        </where>
+        ORDER BY
+        <choose>
+            <when test="orderParams != null and orderParams.size > 0">
+                <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendOrderClause" />
+            </when>
+            <otherwise>
+                T.ID DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="selectWarningListByCondition" parameterType="map" resultType="map">
+        SELECT ID,
+               SERVERSCRIPTID,
+               SCRIPTNAME,
+               ERRORLOG,
+               SCRIPTPATH,
+               SCRIPTSTATUS
+          FROM T_LCDP_ERROR_SCRIPT T
+        <where>
+            <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendWhereClausesIfPresent" />
+           <if test='loginUser.id != "sysAdmin"'>
+           AND (T.SCRIPTSTATUS = 'submit'
+                OR EXISTS (SELECT 1
+                             FROM T_LCDP_RS_CHECKOUT_RECORD C
+                            WHERE C.RESOURCEID = T.SERVERSCRIPTID
+                              AND CHECKOUTUSERID = '${loginUser.id}'))
+           </if>
+           AND EXISTS (SELECT 1 FROM T_LCDP_RESOURCE R WHERE R.ID = T.SERVERSCRIPTID AND R.DELETEFLAG = '0')
+        </where>
+         ORDER BY T.ID
+    </select>
+    
+    <select id="selectAbnormalIdList" resultType="java.lang.Long">
+        SELECT S.ID
+          FROM T_LCDP_ERROR_SCRIPT S
+         WHERE NOT EXISTS (SELECT 1 FROM T_LCDP_RESOURCE R WHERE R.ID = S.SERVERSCRIPTID AND R.DELETEFLAG = '0')
+    </select>
+</mapper>

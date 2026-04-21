@@ -1,0 +1,10 @@
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    Gikam.requireCss(['/static/module/lcdp/database-managers/lcdp-database-manager-detail.css']);
+    Gikam.requirejs([ '/static/module/lcdp/database-managers/lcdp-database-manager.js',
+        '/static/module/lcdp/database-managers/lcdp-database-manager-detail.js'
+    ]);
+
+    lcdpDatabaseManager.detailPage.init(Gikam.getElParam([[${param}]]));
+    /*]]>*/
+</script>

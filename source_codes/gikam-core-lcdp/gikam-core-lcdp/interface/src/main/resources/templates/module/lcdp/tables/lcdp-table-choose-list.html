@@ -1,0 +1,9 @@
+<script th:inline="javascript">
+/*<![CDATA[*/
+    Gikam.requirejs([ '/static/module/lcdp/tables/lcdp-table.js',
+                      '/static/module/lcdp/tables/lcdp-table-choose-list.js'
+                    ]);
+    lcdpTable.choosePage.init(Gikam.getElParam([[${param}]]));
+/*]]>*/
+</script>
+

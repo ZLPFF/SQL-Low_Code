@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    password: lcdp_$test
+    url: jdbc:mysql://172.16.156.45:3306/lcdp_test?serverTimezone=GMT%2B8&useSSL=false
+    username: lcdp_test
+  profiles:
+    include: dev,mysql,audit,schedule,logging,ngtodo

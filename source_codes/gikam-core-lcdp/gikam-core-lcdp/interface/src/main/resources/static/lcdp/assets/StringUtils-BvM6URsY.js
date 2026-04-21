@@ -1,0 +1,1 @@
+class t{static isFirstLetterUppercase(t){return!!t&&/[A-Z]/.test(t.charAt(0))}static firstLetterToLower(t=""){return t.replace(/^[A-Z]/,(t=>t.toLowerCase()))}static firstLetterToUpper(t=""){return t.replace(/^[a-z]/,(t=>t.toUpperCase()))}}export{t as S};

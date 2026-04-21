@@ -1,0 +1,55 @@
+# ===========================================
+# LCDP AI Agent (集成到design模块) 环境变量配置
+# ===========================================
+
+# Ollama 本地模型服务配置（必填）
+# 安装 Ollama: https://ollama.ai/
+# 下载模型: ollama pull qwen2.5:7b
+export OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://localhost:11434}
+export OLLAMA_MODEL=${OLLAMA_MODEL:-qwen2.5:7b}
+export OLLAMA_MAX_TOKENS=${OLLAMA_MAX_TOKENS:-4096}
+export OLLAMA_TEMPERATURE=${OLLAMA_TEMPERATURE:-0.7}
+export OLLAMA_TIMEOUT=${OLLAMA_TIMEOUT:-120}
+
+# Agent 工作空间配置
+export AGENT_WORKSPACE_PATH=${AGENT_WORKSPACE_PATH:-/tmp/lcdp-workspace}
+
+# ===========================================
+# Ollama 安装和启动步骤
+# ===========================================
+
+# 1. 安装 Ollama
+# macOS/Linux:
+# curl -fsSL https://ollama.ai/install.sh | sh
+
+# Windows: 从 https://ollama.ai/download 下载安装
+
+# 2. 启动 Ollama 服务
+# ollama serve
+
+# 3. 下载模型（推荐 Qwen2.5）
+# ollama pull qwen2.5:7b
+# 或更小的模型（更快）：
+# ollama pull qwen2.5:3b
+# ollama pull llama3.2:3b
+
+# 4. 验证 Ollama 服务
+# curl http://localhost:11434/api/tags
+
+# ===========================================
+# 可选的本地模型
+# ===========================================
+
+# Qwen (推荐中文)
+# ollama pull qwen2.5:7b
+# ollama pull qwen2.5:3b
+
+# LLaMA
+# ollama pull llama3.2:3b
+# ollama pull llama3.2:1b
+
+# Phi (微软小模型)
+# ollama pull phi3:3.8b
+
+# 通义千问（阿里）
+# ollama pull qwen:7b

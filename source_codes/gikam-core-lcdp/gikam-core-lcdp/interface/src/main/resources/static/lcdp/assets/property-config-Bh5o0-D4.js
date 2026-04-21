@@ -1,0 +1,1 @@
+import{aA as e,l as a}from"./index-HW-vzrW6.js";import{g as t}from"./events-CcT96FOT.js";const l=[e(),t(),{label:a.value["widget.form.instantSavePath"],valueName:"instantSavePath",type:"RemoteSearchSelect",mappingType:"UPDATE"},{label:a.value["widget.grid.autosave"],valueName:"autoSave",type:"Select"}];export{l as f};

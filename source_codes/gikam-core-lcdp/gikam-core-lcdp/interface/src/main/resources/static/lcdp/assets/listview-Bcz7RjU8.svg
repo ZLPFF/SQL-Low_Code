@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="224px" height="118px" viewBox="0 0 224 118" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>ListView占位图</title>
+    <defs>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#B7C6FF" stop-opacity="0.2" offset="0%"></stop>
+            <stop stop-color="#DEEAFF" stop-opacity="0.2" offset="100%"></stop>
+        </linearGradient>
+        <path d="M43.9436367,101.876007 C36.763935,101.876007 30.9436367,96.0557091 30.9436367,88.8760074 L30.9436367,0.000777673509 L172.243637,0.000777673509 L172.243637,73.9647777 L190.130706,73.9657177 C189.091449,75.5916206 188.57182,77.1114863 188.57182,78.5253149 L188.57182,91.1324235 C188.571812,96.5510232 184.560367,101.0327 179.345189,101.769743 L179.345276,101.876007 L43.9436367,101.876007 Z" id="path-2"></path>
+        <filter x="-1.9%" y="-2.9%" width="107.5%" height="111.8%" filterUnits="objectBoundingBox" id="filter-3">
+            <feOffset dx="3" dy="3" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="1.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0.644242664   0 0 0 0 0.741262433   0 0 0 0 0.952174975  0 0 0 0.37905553 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <linearGradient x1="60.8852687%" y1="50%" x2="84.5136887%" y2="54.0021857%" id="linearGradient-4">
+            <stop stop-color="#DCE5F7" offset="0%"></stop>
+            <stop stop-color="#ECF3FF" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="83.6004811%" y1="-2.09515589%" x2="83.6004811%" y2="100%" id="linearGradient-5">
+            <stop stop-color="#E6EEFF" offset="0%"></stop>
+            <stop stop-color="#F5F8FF" offset="3.79421166%"></stop>
+            <stop stop-color="#E3ECFF" offset="19.5358531%"></stop>
+            <stop stop-color="#E2EBFF" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="98.1277155%" id="linearGradient-6">
+            <stop stop-color="#E7EFFF" offset="0%"></stop>
+            <stop stop-color="#EFF4FF" offset="51.9023816%"></stop>
+            <stop stop-color="#E3ECFF" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="40.2327744%" y1="24.0381374%" x2="29.9533166%" y2="80.4972268%" id="linearGradient-7">
+            <stop stop-color="#E1EAFF" stop-opacity="0" offset="0%"></stop>
+            <stop stop-color="#90ABE7" stop-opacity="0.552942343" offset="100%"></stop>
+        </linearGradient>
+        <filter x="0.0%" y="0.0%" width="100.0%" height="100.0%" filterUnits="objectBoundingBox" id="filter-8">
+            <feGaussianBlur stdDeviation="0" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+    </defs>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="控件" transform="translate(-593.000000, -250.000000)">
+            <g id="ListView占位图" transform="translate(593.000000, 250.000000)">
+                <g id="编组-14">
+                    <ellipse id="freepik--path--inject-95备份" fill="url(#linearGradient-1)" fill-rule="nonzero" cx="112" cy="106.264283" rx="112" ry="11.7357165"></ellipse>
+                    <g id="形状结合" fill="black" fill-opacity="1">
+                        <use filter="url(#filter-3)" xlink:href="#path-2"></use>
+                    </g>
+                    <path d="M189.697725,75.8561782 L192.87977,75.8561782 C193.432055,75.8561782 193.87977,76.3038935 193.87977,76.8561782 L193.87977,77.7609636 L193.87977,77.7609636 L188.697725,77.7609636 L188.697725,76.8561782 C188.697725,76.3038935 189.14544,75.8561782 189.697725,75.8561782 Z" id="矩形" fill="url(#linearGradient-4)"></path>
+                    <path d="M168.643521,75.8561782 L192.818979,75.8561782 C191.984754,75.8113388 191.474677,76.128803 191.288748,76.8085709 C191.149962,77.3159774 190.899695,82.1002759 190.537946,91.1614663 C190.298992,97.1468511 185.377267,101.876007 179.387114,101.876007 C173.453591,101.876007 168.643521,97.0659371 168.643521,91.1324147 L168.643521,75.8561782 L168.643521,75.8561782 Z" id="矩形备份-19" fill="url(#linearGradient-5)"></path>
+                    <path d="M170.059233,0.000777673509 C171.163802,0.000777673509 172.059233,0.896208174 172.059233,2.00077767 L172.059233,92.1115771 C172.156722,95.1783405 174.263504,97.7337053 177.104591,98.5040978 L179.766013,101.876007 L41.8698662,101.876007 C37.4515882,101.876007 33.8698662,98.2942854 33.8698662,93.8760074 L33.8698662,2.00077767 C33.8698662,0.896208174 34.7652967,0.000777673509 35.8698662,0.000777673509 L170.059233,0.000777673509 Z" id="形状结合" fill="url(#linearGradient-6)" fill-rule="nonzero"></path>
+                </g>
+                <path d="M172.157109,74.7274998 L189.090202,74.7274998 C188.099668,75.1193466 187.604401,76.1305012 187.604401,77.7609636 C187.604401,79.0406531 187.386064,83.6018181 186.949389,91.4444584 C186.724777,95.4778043 183.388694,98.6333034 179.349099,98.6333034 C175.377073,98.6333034 172.157109,95.4133402 172.157109,91.4413142 L172.157109,74.7274998 L172.157109,74.7274998 Z" id="矩形备份-19" fill="url(#linearGradient-7)" fill-rule="nonzero" style="mix-blend-mode: multiply;" filter="url(#filter-8)"></path>
+                <path d="M164.364556,4.41538578 C165.469125,4.41538578 166.364556,5.31081628 166.364556,6.41538578 L166.364556,93.9551703 C166.364556,95.3008512 166.956097,96.5738513 167.974117,97.4410418 L168.169954,97.5988031 L45.0985008,97.5988031 C41.7847923,97.5988031 39.0985008,94.9125116 39.0985008,91.5988031 L39.0985008,6.41538578 C39.0985008,5.31081628 39.9939313,4.41538578 41.0985008,4.41538578 L164.364556,4.41538578 Z" id="形状结合" fill-opacity="0.891086605" fill="#FFFFFF" fill-rule="nonzero"></path>
+                <path d="M41.0985008,4.41538578 L164.364556,4.41538578 C165.469125,4.41538578 166.364556,5.31081628 166.364556,6.41538578 L166.364556,19.3696621 L166.364556,19.3696621 L39.0985008,19.3696621 L39.0985008,6.41538578 C39.0985008,5.31081628 39.9939313,4.41538578 41.0985008,4.41538578 Z" id="矩形" fill="#BACFFE"></path>
+                <rect id="矩形" fill="#F8FAFF" x="68.9427929" y="9.50200645" width="90.2897025" height="4.78103496" rx="1"></rect>
+                <rect id="矩形备份-23" fill="#F8FAFF" x="44.3026058" y="9.50200645" width="4.55058952" height="4.78103496" rx="2.27529476"></rect>
+                <rect id="矩形备份-24" fill="#F8FAFF" opacity="0.697399321" x="52.0975972" y="9.50200645" width="4.55058952" height="4.78103496" rx="2.27529476"></rect>
+                <rect id="矩形备份-25" fill="#F8FAFF" opacity="0.514880135" x="59.8925885" y="9.50200645" width="4.55058952" height="4.78103496" rx="2.27529476"></rect>
+                <g id="编组-17" transform="translate(44.743595, 30.591964)" fill="#C8D9FF">
+                    <rect id="矩形" x="0" y="0" width="7.52824566" height="7.51909422" rx="1"></rect>
+                    <rect id="矩形备份-6" x="10.6569367" y="1.23705726" width="21.8210048" height="5.0449797" rx="1"></rect>
+                </g>
+                <g id="编组-17备份-3" opacity="0.799358186" transform="translate(44.743595, 45.988000)" fill="#C8D9FF">
+                    <rect id="矩形" x="0" y="0" width="7.52824566" height="7.51909422" rx="1"></rect>
+                    <rect id="矩形备份-6" x="10.6569367" y="1.23705726" width="21.8210048" height="5.0449797" rx="1"></rect>
+                </g>
+                <g id="编组-17备份-6" opacity="0.369218372" transform="translate(44.743595, 61.384037)" fill="#C8D9FF">
+                    <rect id="矩形" x="0" y="0" width="7.52824566" height="7.51909422" rx="1"></rect>
+                    <rect id="矩形备份-6" x="10.6569367" y="1.23705726" width="21.8210048" height="5.0449797" rx="1"></rect>
+                </g>
+                <g id="编组-17备份-9" opacity="0.369218372" transform="translate(44.743595, 76.780073)" fill="#C8D9FF">
+                    <rect id="矩形" x="0" y="0" width="7.52824566" height="7.51909422" rx="1"></rect>
+                    <rect id="矩形备份-6" x="10.6569367" y="1.23705726" width="21.8210048" height="5.0449797" rx="1"></rect>
+                </g>
+                <g id="编组-17备份" transform="translate(86.893595, 30.591964)" fill="#C8D9FF">
+                    <rect id="矩形" x="0" y="0" width="7.52824566" height="7.51909422" rx="1"></rect>
+                    <rect id="矩形备份-6" x="10.6569367" y="1.23705726" width="21.8210048" height="5.0449797" rx="1"></rect>
+                </g>
+                <g id="编组-17备份-4" opacity="0.799358186" transform="translate(86.893595, 45.988000)" fill="#C8D9FF">
+                    <rect id="矩形" x="0" y="0" width="7.52824566" height="7.51909422" rx="1"></rect>
+                    <rect id="矩形备份-6" x="10.6569367" y="1.23705726" width="21.8210048" height="5.0449797" rx="1"></rect>
+                </g>
+                <g id="编组-17备份-7" opacity="0.369218372" transform="translate(86.893595, 61.384037)" fill="#C8D9FF">
+                    <rect id="矩形" x="0" y="0" width="7.52824566" height="7.51909422" rx="1"></rect>
+                    <rect id="矩形备份-6" x="10.6569367" y="1.23705726" width="21.8210048" height="5.0449797" rx="1"></rect>
+                </g>
+                <g id="编组-17备份-10" opacity="0.369218372" transform="translate(86.893595, 76.780073)" fill="#C8D9FF">
+                    <rect id="矩形" x="0" y="0" width="7.52824566" height="7.51909422" rx="1"></rect>
+                    <rect id="矩形备份-6" x="10.6569367" y="1.23705726" width="21.8210048" height="5.0449797" rx="1"></rect>
+                </g>
+                <g id="编组-17备份-2" transform="translate(129.043595, 30.591964)" fill="#C8D9FF">
+                    <rect id="矩形" x="0" y="0" width="7.52824566" height="7.51909422" rx="1"></rect>
+                    <rect id="矩形备份-6" x="10.6569367" y="1.23705726" width="21.8210048" height="5.0449797" rx="1"></rect>
+                </g>
+                <g id="编组-17备份-5" opacity="0.799358186" transform="translate(129.043595, 45.988000)" fill="#C8D9FF">
+                    <rect id="矩形" x="0" y="0" width="7.52824566" height="7.51909422" rx="1"></rect>
+                    <rect id="矩形备份-6" x="10.6569367" y="1.23705726" width="21.8210048" height="5.0449797" rx="1"></rect>
+                </g>
+                <g id="编组-17备份-8" opacity="0.369218372" transform="translate(129.043595, 61.384037)" fill="#C8D9FF">
+                    <rect id="矩形" x="0" y="0" width="7.52824566" height="7.51909422" rx="1"></rect>
+                    <rect id="矩形备份-6" x="10.6569367" y="1.23705726" width="21.8210048" height="5.0449797" rx="1"></rect>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

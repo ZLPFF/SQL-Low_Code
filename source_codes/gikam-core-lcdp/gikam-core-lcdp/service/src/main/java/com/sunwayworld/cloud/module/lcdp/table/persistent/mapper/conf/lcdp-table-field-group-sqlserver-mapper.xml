@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunwayworld.cloud.module.lcdp.table.mapper.LcdpTableFieldGroupMapper">
+    <select id="selectByCondition" parameterType="map" resultType="map">
+        SELECT T.*
+          FROM T_LCDP_TABLE_FIELD_GROUP T
+        <where>
+            <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendWhereClausesIfPresent" />
+        </where>
+        ORDER BY
+        <choose>
+            <when test="orderParams != null and orderParams.size > 0">
+                <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendOrderClause" />
+            </when>
+            <otherwise>
+                T.ID DESC
+            </otherwise>
+        </choose>
+    </select>
+    <select id="selectTreeNodeList" resultType="map">
+        SELECT T.* 
+          FROM (SELECT O.*,
+                       ISNULL(P.CHILDQTY, 0) CHILDQTY
+                  FROM T_LCDP_TABLE_FIELD_GROUP O
+                  LEFT JOIN (SELECT C.PARENTID,
+                                    COUNT(1) CHILDQTY
+                               FROM T_LCDP_TABLE_FIELD_GROUP C
+                              GROUP BY C.PARENTID) P
+                         ON P.PARENTID = O.ID) T
+        <where>
+            <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendWhereClausesIfPresent" />
+            <if test='parentId != null'>
+                <choose>
+                    <when test='parentId == "root"'>
+                        AND T.PARENTID IS NULL
+                    </when>
+                    <otherwise>
+                        AND T.PARENTID = #{parentId}
+                    </otherwise>
+                </choose>
+            </if>
+        </where>
+        ORDER BY T.ORDERNO
+    </select>
+</mapper>

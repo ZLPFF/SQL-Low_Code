@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunwayworld.cloud.module.lcdp.moduletmpl.persistent.mapper.LcdpModuleTmplPageCompMapper">
+    <select id="selectByCondition" parameterType="map" resultType="map">
+        SELECT
+        T.*
+        FROM
+        (
+        SELECT
+        comp.*, re.pageType
+        FROM
+        T_LCDP_MODULE_TMPL_PAGE_COMP comp
+        JOIN T_LCDP_MODULE_TMPL_RESOURCE re ON
+        comp.moduleTmplPageId = re.id ) T
+        <where>
+            <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendWhereClausesIfPresent" />
+        </where>
+        ORDER BY
+        <choose>
+            <when test="orderParams != null and orderParams.size > 0">
+                <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendOrderClause" />
+            </when>
+            <otherwise>
+                T.ID DESC
+            </otherwise>
+        </choose>
+    </select>
+
+</mapper>

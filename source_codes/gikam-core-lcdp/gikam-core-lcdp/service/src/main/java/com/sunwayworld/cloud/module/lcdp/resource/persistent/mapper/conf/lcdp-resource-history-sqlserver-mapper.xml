@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunwayworld.cloud.module.lcdp.resource.persistent.mapper.LcdpResourceHistoryMapper">
+    <select id="selectByCondition" parameterType="map" resultType="map">
+        <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.selectColumnNames"/>
+          FROM T_LCDP_RESOURCE_HISTORY T
+        <where>
+            <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendWhereClausesIfPresent" />
+        </where>
+        ORDER BY
+        <choose>
+            <when test="orderParams != null and orderParams.size > 0">
+                <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendOrderClause" />
+            </when>
+            <otherwise>
+                T.ID DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="selectDevResourceNameList" resultType="java.lang.String">
+        SELECT RESOURCENAME
+          FROM T_LCDP_RESOURCE_HISTORY
+         WHERE CREATEDBYID = #{userId}
+           AND SUBMITFLAG = 'no'
+           AND DELETEFLAG = '0'
+           AND 
+        <foreach collection="devParamList" item="devParam" separator="OR" open="(" close=")">
+            ( RESOURCENAME = #{devParam.resourceName}
+            <if test="devParam.path != null">
+                AND PATH = #{devParam.path}
+            </if>
+             )
+        </foreach>
+    </select>
+    
+    <select id="selectLatestActivatedListByResourceIdList" resultType="map">
+        SELECT R.*
+          FROM T_LCDP_RESOURCE_HISTORY R
+         WHERE R.DELETEFLAG = '0'
+           AND NOT EXISTS (SELECT 1
+                             FROM T_LCDP_RESOURCE_HISTORY RH
+                            WHERE RH.RESOURCEID = R.RESOURCEID
+                              AND RH.DELETEFLAG = '0'
+                              AND RH.VERSION > R.VERSION)
+           AND R.RESOURCEID IN
+           <foreach collection="resourceIdList" item="resourceId" separator=", " open="(" close=")">
+               ${resourceId}
+           </foreach>
+    </select>
+    
+    <select id="selectMaxVersionListByResourceIdList" resultType="map">
+        SELECT R.RESOURCEID,
+               MAX(R.VERSION) VERSION
+          FROM T_LCDP_RESOURCE_HISTORY R
+         WHERE R.RESOURCEID IN
+           <foreach collection="resourceIdList" item="resourceId" separator=", " open="(" close=")">
+               ${resourceId}
+           </foreach>
+         GROUP BY R.RESOURCEID
+    </select>
+</mapper>

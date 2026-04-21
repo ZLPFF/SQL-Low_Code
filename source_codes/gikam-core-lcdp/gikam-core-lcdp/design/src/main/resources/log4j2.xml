@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+	<Properties>
+		<Property name="appLogDir">/data</Property> <!-- 日志根目录 -->
+	</Properties>
+	<Appenders>
+		<RollingRandomAccessFile name="randomAccessFile"
+								 fileName="${appLogDir}/logs/app.log"
+								 filePattern="${appLogDir}/logs/$${date:yyyy-MM}/app-%d{yyyy-MM-dd}-%i.log"
+								 ignoreExceptions="false" immediateFlush="false" append="true">
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss:SSS} %-5level %c{1} %msg%n" />
+			<Policies>
+				<TimeBasedTriggeringPolicy interval="1" />
+				<SizeBasedTriggeringPolicy size="100 MB" />
+			</Policies>
+		</RollingRandomAccessFile>
+		<Console name="console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss:SSS} %-5level %mdc{pid} %c{1} %msg%n" />
+		</Console>
+
+		<WebSocket name="webSocket">
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5level %c{1} %msg%n" />
+			<!--使用字符串匹配关键字过滤 在debug级别下，当WebSocket消息发出后会产生一条日志，这条日志会导致WebSocket又发送日志-->
+			<Filters>
+				<StringMatchFilter text="Processing MESSAGE destination=" onMatch="DENY" onMismatch="NEUTRAL"/>
+				<StringMatchFilter text="Broadcasting to" onMatch="DENY" onMismatch="NEUTRAL"/>
+			</Filters>
+		</WebSocket>
+
+	</Appenders>
+	<Loggers>
+		<AsyncLogger name="org.mybatis" level="INFO" additivity="false">
+			<AppenderRef ref="console" />
+		</AsyncLogger>
+		<AsyncLogger name="org.apache.ibatis" level="INFO" additivity="false">
+			<AppenderRef ref="console" />
+		</AsyncLogger>
+		<AsyncLogger name="org.quartz" level="ERROR" additivity="false">
+			<AppenderRef ref="console" />
+		</AsyncLogger>
+		<AsyncLogger name="com.fr.third" level="ERROR" additivity="false">
+			<AppenderRef ref="console" />
+		</AsyncLogger>
+		<AsyncLogger name="org.hibernate" level="INFO" additivity="false">
+			<AppenderRef ref="console" />
+		</AsyncLogger>
+		<AsyncLogger name="org.apache.commons" level="ERROR" additivity="false">
+			<AppenderRef ref="console" />
+		</AsyncLogger>
+		<AsyncLogger name="org.apache.struts2" level="ERROR" additivity="false">
+			<AppenderRef ref="console" />
+		</AsyncLogger>
+		<AsyncLogger name="net.sf.ehcache" level="ERROR" additivity="false">
+			<AppenderRef ref="console" />
+		</AsyncLogger>
+		<AsyncLogger name="org.activiti" level="INFO" additivity="false">
+			<AppenderRef ref="console" />
+		</AsyncLogger>
+		<AsyncLogger name="org.springframework" level="INFO" additivity="false">
+			<AppenderRef ref="console" />
+		</AsyncLogger>
+		<AsyncLogger name="org.thymeleaf" level="INFO" additivity="false">
+			<AppenderRef ref="console" />
+		</AsyncLogger>
+		<AsyncLogger name="org.springframework.orm.jpa" level="INFO" additivity="false">
+			<AppenderRef ref="console" />
+		</AsyncLogger>
+		<AsyncLogger name="org.activiti.engine.impl" level="INFO" additivity="false">
+			<AppenderRef ref="console" />
+		</AsyncLogger>
+		<AsyncLogger name="org.activiti.engine.impl.interceptor" level="INFO" additivity="false">
+			<AppenderRef ref="console" />
+		</AsyncLogger>
+		<AsyncLogger name="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping" level="WARN" additivity="false">
+			<AppenderRef ref="console" />
+		</AsyncLogger>
+		<AsyncRoot level="INFO" additivity="false">
+			<AppenderRef ref="console" />
+			<AppenderRef ref="randomAccessFile" />
+			<AppenderRef ref="webSocket"/>
+		</AsyncRoot>
+	</Loggers>
+</Configuration>

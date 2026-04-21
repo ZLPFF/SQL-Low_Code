@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunwayworld.cloud.module.lcdp.table.persistent.mapper.LcdpDatabaseMapper">
+    <select id="selectFieldListByCondition" resultType="map">
+        SELECT T.*
+          FROM (SELECT UPPER(COL.TABLE_NAME) TABLENAME,
+                       UPPER(COL.COLUMN_NAME) FIELDNAME,
+                       COL.UDT_NAME FIELDTYPE,
+                       CASE COL.IS_NULLABLE
+                         WHEN 'YES' THEN
+                          '1'
+                         ELSE
+                          '0'
+                       END ALLOWNULL,
+                       CASE COL.UDT_NAME
+                         WHEN 'varchar' THEN
+                          COL.CHARACTER_MAXIMUM_LENGTH
+                         ELSE
+                          NULL
+                       END FIELDLENGTH,
+                       REPLACE(COALESCE(COL.COLUMN_DEFAULT, ''), '''', '') DEFAULTVALUE,
+                       COL.NUMERIC_PRECISION "PRECISION",
+                       COL.NUMERIC_SCALE "SCALE",
+                       COALESCE(DES.DESCRIPTION, '') FIELDCOMMENT
+                  FROM INFORMATION_SCHEMA.COLUMNS COL
+                  LEFT JOIN PG_DESCRIPTION DES
+                    ON COL.TABLE_NAME ::REGCLASS = DES.OBJOID
+                   AND COL.ORDINAL_POSITION = DES.OBJSUBID
+                 WHERE COL.TABLE_SCHEMA = CURRENT_SCHEMA()
+                 ORDER BY ORDINAL_POSITION) T
+        <where>
+            <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendWhereClausesIfPresent"/>
+        </where>
+    </select>
+
+    <select id="selectFieldListByTableName" resultType="map">
+        SELECT UPPER(COL.TABLE_NAME) TABLENAME,
+               UPPER(COL.COLUMN_NAME) FIELDNAME,
+               COL.UDT_NAME FIELDTYPE,
+               CASE COL.IS_NULLABLE
+                 WHEN 'YES' THEN
+                  '1'
+                 ELSE
+                  '0'
+               END ALLOWNULL,
+               CASE COL.UDT_NAME
+                 WHEN 'varchar' THEN
+                  COL.CHARACTER_MAXIMUM_LENGTH
+                 ELSE
+                  NULL
+               END FIELDLENGTH,
+               REPLACE(COALESCE(COL.COLUMN_DEFAULT, ''), '''', '') DEFAULTVALUE,
+               COL.NUMERIC_PRECISION "PRECISION",
+               COL.NUMERIC_SCALE "SCALE",
+               COALESCE(DES.DESCRIPTION, '') FIELDCOMMENT
+          FROM INFORMATION_SCHEMA.COLUMNS COL
+          LEFT JOIN PG_DESCRIPTION DES
+            ON COL.TABLE_NAME ::REGCLASS = DES.OBJOID
+           AND COL.ORDINAL_POSITION = DES.OBJSUBID
+         WHERE COL.TABLE_SCHEMA = CURRENT_SCHEMA()
+           AND UPPER(COL.TABLE_NAME) = #{tableName}
+         ORDER BY ORDINAL_POSITION
+    </select>
+
+    <select id="selectIndexListByCondition" resultType="map">
+        SELECT T.*
+          FROM (SELECT UPPER(T.TABLE_NAME) TABLENAME,
+                       UPPER(I.RELNAME) INDEXNAME,
+                       STRING_AGG(UPPER(A.ATTNAME), ',') INDEXFIELD,
+                       CASE
+                         WHEN IX.INDISPRIMARY THEN
+                          '${@com.sunwayworld.cloud.module.lcdp.table.helper.IndexType@primarykey}'
+                         WHEN IX.INDISUNIQUE THEN
+                          '${@com.sunwayworld.cloud.module.lcdp.table.helper.IndexType@unique}'
+                         ELSE
+                          '${@com.sunwayworld.cloud.module.lcdp.table.helper.IndexType@regular}'
+                       END INDEXTYPE
+                  FROM (SELECT PC.RELNAME TABLE_NAME, PC.* FROM PG_CLASS PC) T,
+                       PG_CLASS I,
+                       PG_INDEX IX,
+                       PG_ATTRIBUTE A
+                 WHERE T.OID = IX.INDRELID
+                   AND I.OID = IX.INDEXRELID
+                   AND A.ATTRELID = T.OID
+                   AND A.ATTNUM = ANY(IX.INDKEY)
+                   AND T.RELKIND = 'r'
+                 GROUP BY T.TABLE_NAME, I.RELNAME, IX.INDISUNIQUE, IX.INDISPRIMARY
+                 ORDER BY INDEXTYPE) T
+        <where>
+            <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendWhereClausesIfPresent"/>
+        </where>
+    </select>
+
+    <select id="selectIndexListByTableName" resultType="map">
+        SELECT UPPER(T.TABLE_NAME) TABLENAME,
+               UPPER(I.RELNAME) INDEXNAME,
+               STRING_AGG(UPPER(A.ATTNAME), ',') INDEXFIELD,
+               CASE
+                 WHEN IX.INDISPRIMARY THEN
+                  '${@com.sunwayworld.cloud.module.lcdp.table.helper.IndexType@primarykey}'
+                 WHEN IX.INDISUNIQUE THEN
+                  '${@com.sunwayworld.cloud.module.lcdp.table.helper.IndexType@unique}'
+                 ELSE
+                  '${@com.sunwayworld.cloud.module.lcdp.table.helper.IndexType@regular}'
+               END INDEXTYPE
+          FROM (SELECT PC.RELNAME TABLE_NAME, PC.* FROM PG_CLASS PC) T,
+               PG_CLASS I,
+               PG_INDEX IX,
+               PG_ATTRIBUTE A
+         WHERE T.OID = IX.INDRELID
+           AND I.OID = IX.INDEXRELID
+           AND A.ATTRELID = T.OID
+           AND A.ATTNUM = ANY(IX.INDKEY)
+           AND T.RELKIND = 'r'
+           AND UPPER(T.TABLE_NAME) = #{tableName}
+         GROUP BY T.TABLE_NAME, I.RELNAME, IX.INDISUNIQUE, IX.INDISPRIMARY
+         ORDER BY INDEXTYPE
+    </select>
+
+    <select id="countByTableName" resultType="int">
+        SELECT COUNT(1)
+          FROM INFORMATION_SCHEMA.TABLES
+         WHERE TABLE_SCHEMA = CURRENT_SCHEMA()
+           AND TABLE_TYPE = 'BASE TABLE'
+           AND UPPER(TABLE_NAME) = #{tableName}
+    </select>
+
+    <select id="countByIndexName" resultType="int">
+        SELECT 0
+    </select>
+
+    <select id="countByViewName" resultType="int">
+        SELECT COUNT(1)
+          FROM INFORMATION_SCHEMA.TABLES
+         WHERE TABLE_SCHEMA = CURRENT_SCHEMA()
+           AND TABLE_TYPE = 'VIEW'
+           AND UPPER(TABLE_NAME) = #{viewName}
+    </select>
+
+    <select id="selectTableInfoByCondition" resultType="map">
+        SELECT T.*
+          FROM (SELECT UPPER(TAB.TABLE_NAME) TABLENAME, DES.DESCRIPTION TABLEDESC
+                  FROM INFORMATION_SCHEMA.TABLES TAB
+                  LEFT JOIN PG_DESCRIPTION DES
+                    ON TAB.TABLE_NAME ::REGCLASS = DES.OBJOID
+                   AND DES.OBJSUBID = 0
+                 WHERE TAB.TABLE_SCHEMA = CURRENT_SCHEMA()
+                   AND TAB.TABLE_TYPE = 'BASE TABLE') T
+        <where>
+            <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendWhereClausesIfPresent"/>
+        </where>
+    </select>
+
+    <select id="selectTableInfoByTableName" resultType="map">
+        SELECT UPPER(TAB.TABLE_NAME) TABLENAME, DES.DESCRIPTION TABLEDESC
+          FROM INFORMATION_SCHEMA.TABLES TAB
+          LEFT JOIN PG_DESCRIPTION DES
+                 ON TAB.TABLE_NAME ::REGCLASS = DES.OBJOID
+                AND DES.OBJSUBID = 0
+         WHERE TAB.TABLE_SCHEMA = CURRENT_SCHEMA()
+           AND TAB.TABLE_TYPE = 'BASE TABLE'
+           AND UPPER(TAB.TABLE_NAME) = #{tableName}
+    </select>
+
+    <select id="selectTableNameListByCondition" resultType="map">
+        SELECT T.*
+        FROM (SELECT UPPER(TAB.TABLE_NAME) TABLENAME
+                FROM INFORMATION_SCHEMA.TABLES TAB
+                WHERE TAB.TABLE_SCHEMA = CURRENT_SCHEMA()
+                  AND TAB.TABLE_TYPE = 'BASE TABLE') T
+        <where>
+            <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendWhereClausesIfPresent"/>
+        </where>
+        ORDER BY T.TABLENAME
+    </select>
+
+    <select id="selectViewInfoListByCondition" resultType="map">
+        SELECT T.*
+          FROM (SELECT UPPER(V.TABLE_NAME) VIEWNAME,
+                       UPPER(V.TABLE_NAME) TABLENAME,
+                       V.VIEW_DEFINITION SELECTSTATEMENT
+                  FROM INFORMATION_SCHEMA.VIEWS V
+                 WHERE V.TABLE_SCHEMA = CURRENT_SCHEMA()
+              ORDER BY V.TABLE_NAME) T
+        <where>
+            <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendWhereClausesIfPresent"/>
+        </where>
+    </select>
+
+    <select id="lockTableByTableName" resultType="map">
+        SELECT * FROM ${tableName} FOR UPDATE
+    </select>
+
+    <select id="selectTableOrViewNameListByCondition" resultType="map">
+        SELECT T.*
+          FROM (SELECT UPPER(TAB.TABLE_NAME) TABLEORVIEWNAME,
+                       'table' DBSTRUCTURETYPE
+                  FROM INFORMATION_SCHEMA.TABLES TAB
+                 WHERE TAB.TABLE_SCHEMA = CURRENT_SCHEMA()
+                   AND TAB.TABLE_TYPE = 'BASE TABLE'
+                 UNION
+                SELECT UPPER(V.TABLE_NAME) TABLEORVIEWNAME,
+                       'view' DBSTRUCTURETYPE
+                  FROM INFORMATION_SCHEMA.VIEWS V
+                 WHERE V.TABLE_SCHEMA = CURRENT_SCHEMA()
+              ORDER BY TABLEORVIEWNAME) T
+        <where>
+            <include refid="com.sunwayworld.framework.mybatis.mapper.GlobalMapper.appendWhereClausesIfPresent"/>
+        </where>
+    </select>
+</mapper>

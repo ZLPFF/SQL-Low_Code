@@ -1,0 +1,81 @@
+server:
+  port: 8182
+  #servlet:
+   # context-path: /sunway
+  error:
+    include-exception: true #异常的json串中包含exception类信息
+sunway:
+  appmarket:
+    url: http://172.16.172.72:8010/open/cloud/module/lcdp/funcs
+  bpmn:
+    process-status:
+      show-all-task-candidators-in-progress: true
+  app:
+    license: avcUtrF4N62d5uozoqogg6uHB1ELuXQ0Fz9c4SXrPYR2zMqYqEutCPHaENbl8u3Zann8x9zdI5CLisbdx1c7/WlECwYK0VNF
+  config:
+    file:
+      server:
+        url: http://localhost:8182
+  monitor:
+    error:
+      log:
+        enabled: false
+    datasource:
+      log:
+        enabled: true
+    threadpool:
+      log:
+        enabled: true
+  mybatis:
+    interceptors:
+      - com.sunwayworld.framework.mybatis.interceptor.MybatisInterceptor
+      - com.sunwayworld.framework.mybatis.interceptor.MonitorInterceptor
+      - com.sunwayworld.framework.mybatis.interceptor.MybatisResultSetInterceptor
+      - com.sunwayworld.cloud.module.lcdp.message.log.LcdpScriptLogMybatisInterceptor
+  security:
+    csrf:
+      enabled: false
+  data:
+    masking:
+      T_NOTICE_120401:
+        - TITLE
+        - IMPORTANCE
+        - CONTENT
+spring:
+  profiles:
+    active: mysql-dev
+  config:
+    use-legacy-processing: true
+  application:
+    name:  gikam-core-lcdp
+  resources:
+    chain:
+      strategy:
+        content:
+          enabled: false
+  redis:
+    database: 9
+    host: localhost
+    port: 6379
+    password: sunway612
+management:
+  endpoint:
+    env:
+      post:
+        enabled: false #环境端点自动配置
+
+# AI Agent 配置
+lcdp:
+  agent:
+    enabled: true
+    model: ${OLLAMA_MODEL:qwen2.5:7b}
+    ollama-base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+    max-tokens: ${OLLAMA_MAX_TOKENS:4096}
+    temperature: ${OLLAMA_TEMPERATURE:0.7}
+    timeout-seconds: ${OLLAMA_TIMEOUT:120}
+    api-base: /open/core/module/lcdp/agent
+    workspace:
+      base-path: ${AGENT_WORKSPACE_PATH:/tmp/lcdp-workspace}
+    checkout:
+      auto-submit: false
+      default-timeout: 300
