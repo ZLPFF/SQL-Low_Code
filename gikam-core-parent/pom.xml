@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.sunwayworld.cloud</groupId>
+    <artifactId>gikam-core-parent</artifactId>
+    <version>14.2.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>Gikam Core Parent</name>
+    <description>Stub parent POM for development</description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <spring-boot.version>2.3.12.RELEASE</spring-boot.version>
+    </properties>
+
+</project>
